@@ -1,16 +1,16 @@
 /*
  * jQuery css bezier animation support -- Jonah Fox
- * version 0.0.1
+ * version 0.0.2
  * Released under the MIT license.
  */
 /*
-  var path = $.path.bezier({
-    start: {x:10, y:10, angle: 20, length: 0.3},
-    end:   {x:20, y:30, angle: -20, length: 0.2}
-  })
-  $("myobj").animate({path: path}, duration)
+ var path = $.path.bezier({
+ start: {x:10, y:10, angle: 20, length: 0.3},
+ end:   {x:20, y:30, angle: -20, length: 0.2}
+ })
+ $("myobj").animate({path: path}, duration)
 
-*/
+ */
 
 ;(function($){
 
@@ -73,67 +73,71 @@
   };
 
   $.path.arc = function(params, rotate) {
-    for ( var i in params ) {
-      this[i] = params[i];
-    }
-    this.dir = this.dir || 1;
+      for ( var i in params ) {
+        this[i] = params[i];
+      }
+      this.dir = this.dir || 1;
 
-    while ( this.start > this.end && this.dir > 0 ) {
+      while ( this.start > this.end && this.dir > 0 ) {
         this.start -= 360;
-    }
+      }
 
-    while ( this.start < this.end && this.dir < 0 ) {
+      while ( this.start < this.end && this.dir < 0 ) {
         this.start += 360;
-    }
+      }
 
-    if(this.spiral) {
+      if(this.spiral) {
         if(this.spiral.constructor == Array && this.spiral.length > 1) {
-            this.radiusStart = this.spiral[0] || 1;
-            this.radiusEnd = this.spiral[1] || 1;
+          this.radiusStart = this.spiral[0] || 1;
+          this.radiusEnd = this.spiral[1] || 1;
         } else {
-            this.radiusStart = 1;
-            this.radiusEnd = (this.spiral.constructor == Array ? this.spiral[0] : this.spiral) || 1;
+          this.radiusStart = 1;
+          this.radiusEnd = (this.spiral.constructor == Array ? this.spiral[0] : this.spiral) || 1;
         }
         this.radius = this.radiusStart;
         this.radiusDiff = Math.abs(this.radiusEnd - this.radiusStart);
-    }
+      }
 
-    if(this.center.constructor.constructor == Function) {
+      if(this.center.css && this.center.css.constructor == Function) {
         this.centerPath = this.center;
-    }
-
-    this.css = function(p) {
-      var a = ( this.start * (p ) + this.end * (1-(p )) ) * Math.PI / 180,
-              css = {};
-
-      if (rotate) {
-        css.prevX = this.x;
-        css.prevY = this.y;
+        this.center = [0,0];
       }
 
-      var centerX;
-      var centerY;
-      if(this.centerPath) {
-        var centerPosition = this.centerPath.css(p);
-        centerX = centerPosition.x;
-        centerY = centerPosition.y;
+      this.css = function(p) {
+        var a = ( this.start * (p ) + this.end * (1-(p )) ) * Math.PI / 180,
+          css = {};
 
-      } else {
-        centerX = this.center[0];
-        centerY = this.center[1];
-      }
+        if (rotate) {
+          css.prevX = this.x;
+          css.prevY = this.y;
+        }
 
-      css.x = this.x = ( Math.sin(a) * this.radius + centerX +.5 )|0;
-      css.y = this.y = ( Math.cos(a) * this.radius + centerY +.5 )|0;
-      css.left = css.x + "px";
-      css.top = css.y + "px";
+        if(this.centerPath) {
+          var pos = this.centerPath.css(p);
+          this.center[0] = pos.x;
+          this.center[1] = pos.y;
+        }
 
-      if(this.spiral) {
-        this.radius = this.radiusStart + (this.radiusDiff - (this.radiusDiff * p));
-      }
+        css.x = this.x = ( Math.sin(a) * this.radius + this.center[0] +.5 )|0;
+        css.y = this.y = ( Math.cos(a) * this.radius + this.center[1] +.5 )|0;
+        css.left = css.x + "px";
+        css.top = css.y + "px";
 
-      return css;
+        if(this.spiral) {
+          this.radius = this.radiusStart + (this.radiusDiff - (this.radiusDiff * p));
+        }
+
+        return css;
     };
-  }
+  };
+
+  $.fx.step.path = function(fx) {
+    var css = fx.end.css( 1 - fx.pos );
+    if ( css.prevX != null ) {
+      $.cssHooks.transform.set( fx.elem, "rotate(" + Math.atan2(css.prevY - css.y, css.prevX - css.x) + ")" );
+    }
+    fx.elem.style.top = css.top;
+    fx.elem.style.left = css.left;
+  };
 
 })(jQuery);
