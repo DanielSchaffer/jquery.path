@@ -43,8 +43,7 @@ Arc
 
 Example: animate along an arc
 
-<pre>
-  
+<pre>  
 var arc_params = {
     center: [285,185],	
 		radius: 100,	
@@ -67,7 +66,7 @@ $("my_elem").animate({path : new $.path.arc(arc_params)})
 Example: add a spiral to the arc
 
 <pre>
-  var arc_params = {
+var arc_params = {
     center: [285, 185],
     spiral: [1, 100],
     start: 30,
@@ -81,7 +80,7 @@ Example: add a spiral to the arc
 Example: use another path as the center of the arc
 
 <pre>
-  var bezier_params = {
+var bezier_params = {
     start: { 
       x: 185, 
       y: 185, 
@@ -95,7 +94,7 @@ Example: use another path as the center of the arc
     }
   }
 
-  var arc_params = {
+var arc_params = {
     center: new $.path.bezier(bezier_params),
     radius: 100,
     start: 30,
@@ -103,12 +102,12 @@ Example: use another path as the center of the arc
     dir: -1
   }
 
-  $('my_elem').animate({path : new $.path.arc(arc_params)})
+$('my_elem').animate({path : new $.path.arc(arc_params)})
 </pre>
 
 Example: combine both the spiral and center paths
 <pre>
-  var bezier_params = {
+var bezier_params = {
     start: { 
       x: 185, 
       y: 185, 
@@ -122,7 +121,7 @@ Example: combine both the spiral and center paths
     }
   }
 
-  var arc_params = {
+var arc_params = {
     center: new $.path.bezier(bezier_params),
     radius: [1, 100],
     start: 30,
@@ -130,7 +129,58 @@ Example: combine both the spiral and center paths
     dir: -1
   }
 
-  $('my_elem').animate({path : new $.path.arc(arc_params)})
+$('my_elem').animate({path : new $.path.arc(arc_params)})
+</pre>
+
+Rotation
+---
+Rotation can be added to any path by specifying a rotator.
+
+Example: keep the top of the element facing forward on the path
+
+<pre>
+var bezier_params = {
+    start: { 
+      x: 185, 
+      y: 185, 
+      angle: 10
+    },  
+    end: { 
+      x:540,
+      y:110, 
+      angle: -10, 
+      length: 0.25
+    },
+    rotator: new $.path.rotators.followPath()
+  }
+  
+$("my_elem").animate({path : new $.path.bezier(bezier_params)})
+</pre>
+
+Example: make the element spin
+<pre>
+var spin_params = {
+    start: 30,
+    end: 200,
+    dir: -1
+  }
+
+var bezier_params = {
+    start: { 
+      x: 185, 
+      y: 185, 
+      angle: 10
+    },  
+    end: { 
+      x:540,
+      y:110, 
+      angle: -10, 
+      length: 0.25
+    },
+    rotator: new $.path.rotators.spin(spin_params)
+  }
+  
+$("my_elem").animate({path : new $.path.bezier(bezier_params)})
 </pre>
 
 Other Paths
