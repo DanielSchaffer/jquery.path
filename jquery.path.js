@@ -76,40 +76,64 @@
     for ( var i in params ) {
       this[i] = params[i];
     }
-
     this.dir = this.dir || 1;
 
     while ( this.start > this.end && this.dir > 0 ) {
-      this.start -= 360;
+        this.start -= 360;
     }
 
     while ( this.start < this.end && this.dir < 0 ) {
-      this.start += 360;
+        this.start += 360;
+    }
+
+    if(this.spiral) {
+        if(this.spiral.constructor == Array && this.spiral.length > 1) {
+            this.radiusStart = this.spiral[0] || 1;
+            this.radiusEnd = this.spiral[1] || 1;
+        } else {
+            this.radiusStart = 1;
+            this.radiusEnd = (this.spiral.constructor == Array ? this.spiral[0] : this.spiral) || 1;
+        }
+        this.radius = this.radiusStart;
+        this.radiusDiff = Math.abs(this.radiusEnd - this.radiusStart);
+    }
+
+    if(this.center.constructor.constructor == Function) {
+        this.centerPath = this.center;
     }
 
     this.css = function(p) {
       var a = ( this.start * (p ) + this.end * (1-(p )) ) * Math.PI / 180,
-        css = {};
+              css = {};
 
       if (rotate) {
         css.prevX = this.x;
         css.prevY = this.y;
       }
-      css.x = this.x = ( Math.sin(a) * this.radius + this.center[0] +.5 )|0;
-      css.y = this.y = ( Math.cos(a) * this.radius + this.center[1] +.5 )|0;
+
+      var centerX;
+      var centerY;
+      if(this.centerPath) {
+        var centerPosition = this.centerPath.css(p);
+        centerX = centerPosition.x;
+        centerY = centerPosition.y;
+
+      } else {
+        centerX = this.center[0];
+        centerY = this.center[1];
+      }
+
+      css.x = this.x = ( Math.sin(a) * this.radius + centerX +.5 )|0;
+      css.y = this.y = ( Math.cos(a) * this.radius + centerY +.5 )|0;
       css.left = css.x + "px";
       css.top = css.y + "px";
+
+      if(this.spiral) {
+        this.radius = this.radiusStart + (this.radiusDiff - (this.radiusDiff * p));
+      }
+
       return css;
     };
-  };
-
-  $.fx.step.path = function(fx) {
-    var css = fx.end.css( 1 - fx.pos );
-    if ( css.prevX != null ) {
-      $.cssHooks.transform.set( fx.elem, "rotate(" + Math.atan2(css.prevY - css.y, css.prevX - css.x) + ")" );
-    }
-    fx.elem.style.top = css.top;
-    fx.elem.style.left = css.left;
-  };
+  }
 
 })(jQuery);
