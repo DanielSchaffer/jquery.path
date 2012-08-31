@@ -41,7 +41,7 @@ Bezier curves are made form a start point, an end point each with a control poin
 Arc
 ---
 
-Exampe: animate along an arc
+Example: animate along an arc
 
 <pre>
   
@@ -61,6 +61,77 @@ $("my_elem").animate({path : new $.path.arc(arc_params)})
 * start is the angle of the start point. 0 is "North", measured clockwise
 * end is the angle of the start point. 0 is "North", measured clockwise
 * dir is the direction to move in. Only required if not obvious from start and end (e.g. if start is 100, end is 30, but you want to animate clockwise)
+
+### Advanced Arcs ###
+
+Example: add a spiral to the arc
+
+<pre>
+  var arc_params = {
+    center: [285, 185],
+    spiral: [1, 100],
+    start: 30,
+    end: 200,
+    dir: -1
+  }
+
+  $('my_elem').animate({path : new $.path.arc(arc_params)})
+</pre>
+
+Example: use another path as the center of the arc
+
+<pre>
+  var bezier_params = {
+    start: { 
+      x: 185, 
+      y: 185, 
+      angle: 10
+    },  
+    end: { 
+      x:540,
+      y:110, 
+      angle: -10, 
+      length: 0.25
+    }
+  }
+
+  var arc_params = {
+    center: new $.path.bezier(bezier_params),
+    radius: 100,
+    start: 30,
+    end: 200,
+    dir: -1
+  }
+
+  $('my_elem').animate({path : new $.path.arc(arc_params)})
+</pre>
+
+Example: combine both the spiral and center paths
+<pre>
+  var bezier_params = {
+    start: { 
+      x: 185, 
+      y: 185, 
+      angle: 10
+    },  
+    end: { 
+      x:540,
+      y:110, 
+      angle: -10, 
+      length: 0.25
+    }
+  }
+
+  var arc_params = {
+    center: new $.path.bezier(bezier_params),
+    radius: [1, 100],
+    start: 30,
+    end: 200,
+    dir: -1
+  }
+
+  $('my_elem').animate({path : new $.path.arc(arc_params)})
+</pre>
 
 Other Paths
 ----
